@@ -1,0 +1,21 @@
+{
+  "demo_id": "demo_4",
+  "files": {
+    "context": "demo_4/ctx_bass_00.wav",
+    "reference": "demo_4/ref_guitare 1 r_00.wav",
+    "baseline": {
+      "baseline_0_65": "demo_4/partial_0.65_norm.mp3",
+      "baseline_0_70": "demo_4/partial_0.7_norm.mp3"
+    },
+    "marco_1": [
+      "demo_4/marco_1_k_0.55_clamp_0.25_norm.mp3"
+    ],
+    "marco_2": [
+      "demo_4/marco_2_k_0.2_clamp_0.35_norm.mp3"
+    ]
+  },
+  "meta":{
+    "context_instrument": "Bass", 
+    "reference_instrument": "Guitar" 
+  }
+}
