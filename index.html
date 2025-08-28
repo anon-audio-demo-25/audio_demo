@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Audio Demos — Anonymous Submission</title>
+<meta name="robots" content="noindex,nofollow" />
+<style>
+  :root{
+    --fg:#1f2937; --bg:#ffffff; --muted:#6b7280; --line:#e5e7eb;
+    --heroA:#0f4aa3; --heroB:#12a36b; --card:#f8fafc;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --fg:#e5e7eb; --bg:#0b0f14; --muted:#9aa4b2; --line:#1f2937;
+      --heroA:#123a7a; --heroB:#0f7f59; --card:#0f1620;
+    }
+  }
+  html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:#2563eb;text-decoration:none} a:hover{text-decoration:underline}
+
+  .hero{
+    background:linear-gradient(135deg,var(--heroA),var(--heroB));
+    color:#fff; text-align:center; padding:56px 16px;
+  }
+  .hero h1{margin:0 0 8px; font-size:2.2rem; letter-spacing:.3px}
+  .hero p{margin:0; opacity:.9}
+
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 16px 60px}
+  .demo-title{margin:28px 0 8px;font-weight:700;text-align:center}
+
+  .table-wrap{
+    border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.04); background:transparent; margin:12px 0 28px;
+  }
+
+  /* Equal-width columns via fixed layout + colgroup */
+  table{width:100%;border-collapse:separate;border-spacing:0;margin:0;table-layout:fixed}
+  thead th{background:var(--card); text-align:center; padding:12px 10px; border-bottom:1px solid var(--line)}
+  th,td{padding:12px 10px; vertical-align:middle; text-align:center}
+  tbody td + td{border-left:1px solid var(--line)}
+  thead th + th{border-left:1px solid var(--line)}
+
+  .th-title{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .th-title small{color:var(--muted);font-weight:400;font-size:.9rem}
+
+  .cell{display:flex;flex-direction:column;align-items:center;gap:6px}
+  audio{width:100%;max-width:300px;height:40px;display:block;margin:0 auto}
+  /* optional compact controls (webkit) */
+  audio::-webkit-media-controls-timeline,
+  audio::-webkit-media-controls-seek-back-button,
+  audio::-webkit-media-controls-seek-forward-button{ display:none !important; }
+
+  small{display:block;color:var(--muted);text-align:center;max-width:320px;overflow-wrap:anywhere}
+  td[data-metrics]{text-align:center;font-variant-numeric:tabular-nums}
+
+  .sub{color:var(--muted);text-align:center;margin:0 0 18px}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Audio Demos</h1>
+    <p>tmp</p>
+  </header>
+
+  <div class="wrap">
+    <p class="sub"> Parameters for our methods are <em>tuned per demo</em> to highlight flexibility; the paper analyses structure in depth, but this demo emphasises timbre.</p>
+    <div id="tables"></div>
+  </div>
+
+<script>
+(async function(){
+  async function fetchJSON(paths){
+    for (const p of paths){
+      try { const r = await fetch(p, {cache:'no-store'}); if (r.ok) return await r.json(); } catch(e){}
+    }
+    return null;
+  }
+  const audioBases = ["audio/", "../audio/"];
+
+  const demosIndex = await fetchJSON(audioBases.map(a => a + "demos.json"));
+  if(!demosIndex){
+    document.getElementById('tables').innerHTML = "<p class='sub'>no demos.json found</p>";
+    return;
+  }
+
+  function audioTag(relPath, mime){
+    const a = document.createElement('audio'); a.controls = true; a.preload = 'none';
+    const s1 = document.createElement('source'); s1.src = "audio/" + relPath; s1.type = mime; a.appendChild(s1);
+    const s2 = document.createElement('source'); s2.src = "../audio/" + relPath; s2.type = mime; a.appendChild(s2);
+    return a;
+  }
+  function guessMime(p){ return p.toLowerCase().endsWith(".mp3") ? "audio/mp3" : "audio/wav"; }
+  function fileName(p){ return p.split('/').pop(); }
+
+  function parseParamsFromName(name){
+    const k = (name.match(/(?:^|[_-])k[_-]?([0-9.]+)/i) || [])[1];
+    const clamp = (name.match(/clamp[_-]?([0-9.]+)/i) || [])[1];
+    const bits = [];
+    if (k) bits.push(`top_k = ${k}`);
+    if (clamp) bits.push(`clamp = ${clamp}`);
+    return bits.join(', ');
+  }
+
+  // Keep deterministic ordering (numeric by demo_id if present)
+  const demosSorted = [...(demosIndex.demos || [])].sort((a, b) => {
+    const na = parseInt((a.demo_id||'').match(/\d+/)?.[0] ?? '0', 10);
+    const nb = parseInt((b.demo_id||'').match(/\d+/)?.[0] ?? '0', 10);
+    return na - nb;
+  });
+
+  const host = document.getElementById('tables');
+
+  // create a 6-col colgroup with equal widths
+  function equalCols(){
+    const cg = document.createElement('colgroup');
+    for (let i=0;i<6;i++){ const c = document.createElement('col'); c.style.width = (100/6)+'%'; cg.appendChild(c); }
+    return cg;
+  }
+
+  // cell builder; `labelText` is optional (we'll use it only for context/reference instruments)
+  function makeCell(rel, tagKey, metrics, labelText){
+    const td = document.createElement('td');
+    if (!rel){ td.textContent = '—'; return td; }
+    const w = document.createElement('div'); w.className = 'cell';
+    w.appendChild(audioTag(rel, guessMime(rel)));
+    if (labelText){  // no filenames anymore
+      const s = document.createElement('small');
+      s.textContent = labelText;
+      w.appendChild(s);
+    }
+    // metrics line kept but commented out:
+    // const m = metrics && metrics.results ? metrics.results[tagKey] : null;
+    // if (m){ const mm = document.createElement('small'); mm.textContent = `DPD ${m.DPD_mean?.toFixed?.(1) ?? '—'} | CLAP ${m.CLAP_mean?.toFixed?.(3) ?? '—'}`; w.appendChild(mm); }
+    td.appendChild(w);
+    return td;
+  }
+
+  function thWithParams(title, params){
+    const th = document.createElement('th');
+    const box = document.createElement('div'); box.className = 'th-title';
+    const span = document.createElement('span'); span.textContent = title;
+    box.appendChild(span);
+    if (params){
+      const sm = document.createElement('small'); sm.textContent = params;
+      box.appendChild(sm);
+    }
+    th.appendChild(box);
+    return th;
+  }
+
+  let displayIndex = 0; // <-- sequential demo numbering
+  for (const item of demosSorted){
+    const manifest = await fetchJSON(audioBases.map(a => a + item.manifest));
+    const metrics  = await fetchJSON(audioBases.map(a => a + item.metrics));
+    if(!manifest){ continue; }
+
+    displayIndex += 1;  // increment only for demos we actually render
+
+    const ctxRel = manifest.files.context;
+    const refRel = manifest.files.reference;
+
+    // instruments (optional) — put these in manifest.json or labels.json override
+    const ctxInst = manifest.meta?.context_instrument || manifest.labels?.context || "";
+    const refInst = manifest.meta?.reference_instrument || manifest.labels?.reference || "";
+
+    const baselineMap = manifest.files.baseline || {};
+    const b065 = baselineMap["baseline_0_65"] || null;
+    const b070 = baselineMap["baseline_0_70"] || null;
+
+    const m1List = manifest.files.marco_1 || [];
+    const m2List = manifest.files.marco_2 || [];
+    const m1Rel  = m1List.length ? m1List[0] : null;
+    const m2Rel  = m2List.length ? m2List[0] : null;
+
+    const m1Params = m1Rel ? parseParamsFromName(fileName(m1Rel)) : "";
+    const m2Params = m2Rel ? parseParamsFromName(fileName(m2Rel)) : "";
+
+    const section = document.createElement('section');
+    section.id = `demo-${displayIndex}`; // optional anchor
+
+    const title = document.createElement('div');
+    title.className = 'demo-title';
+    title.textContent = `Demo ${displayIndex}`;  // <-- numbered title (not folder name)
+
+    const card = document.createElement('div'); card.className = 'table-wrap';
+    const tbl = document.createElement('table');
+
+    // equal-width columns
+    tbl.appendChild(equalCols());
+
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    hr.appendChild(thWithParams('Context', ''));
+    hr.appendChild(thWithParams('Reference', ''));
+    hr.appendChild(thWithParams('Baseline 0.65', ''));
+    hr.appendChild(thWithParams('Baseline 0.70', ''));
+    hr.appendChild(thWithParams('Ours (M1)', m1Params));
+    hr.appendChild(thWithParams('Old (M2)', m2Params));
+    thead.appendChild(hr);
+    tbl.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const row = document.createElement('tr');
+
+    row.appendChild(makeCell(ctxRel, null, null, ctxInst || null));
+    row.appendChild(makeCell(refRel, null, null, refInst || null));
+    row.appendChild(makeCell(b065, "baseline_0_65", metrics, null));
+    row.appendChild(makeCell(b070, "baseline_0_70", metrics, null));
+    row.appendChild(makeCell(m1Rel, "marco_1", metrics, null));
+    row.appendChild(makeCell(m2Rel, "marco_2", metrics, null));
+
+    tbody.appendChild(row);
+    tbl.appendChild(tbody);
+
+    card.appendChild(tbl);
+    section.appendChild(title);
+    section.appendChild(card);
+    document.getElementById('tables').appendChild(section);
+  }
+})();
+</script>
+</body>
+</html>
