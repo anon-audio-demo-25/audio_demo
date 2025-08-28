@@ -1,0 +1,21 @@
+{
+  "demo_id": "demo_9",
+  "files": {
+    "context": "demo_9/ctx_accordeon_00.wav",
+    "reference": "demo_9/ref_squaretheme_00.wav",
+    "baseline": {
+      "baseline_0_65": "demo_9/partial_0.65_norm.mp3",
+      "baseline_0_70": "demo_9/partial_0.7_norm.mp3"
+    },
+    "marco_1": [
+      "demo_9/marco_1_k_0.55_clamp_0.3_norm.mp3"
+    ],
+    "marco_2": [
+      "demo_9/marco_2_k_0.25_clamp_0.2_norm.mp3"
+    ]
+  },
+  "meta":{
+    "context_instrument": "Accordeon", 
+    "reference_instrument": "SquareTheme" 
+  }
+}
