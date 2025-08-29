@@ -1,8 +1,8 @@
 {
   "demo_id": "demo_6",
   "files": {
-    "context": "demo_6/ctx_perc_00.wav",
-    "reference": "demo_6/ref_mandolin_00.wav",
+    "context": "demo_6/ctx_perc_00_norm.wav",
+    "reference": "demo_6/ref_mandolin_00_norm.wav",
     "baseline": {
       "baseline_0_65": "demo_6/partial_0.65_norm.mp3",
       "baseline_0_70": "demo_6/partial_0.7_norm.mp3"
