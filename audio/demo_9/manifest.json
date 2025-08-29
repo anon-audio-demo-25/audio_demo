@@ -1,8 +1,8 @@
 {
   "demo_id": "demo_9",
   "files": {
-    "context": "demo_9/ctx_accordeon_00.wav",
-    "reference": "demo_9/ref_squaretheme_00.wav",
+    "context": "demo_9/ctx_accordeon_00_norm.wav",
+    "reference": "demo_9/ref_squaretheme_00_norm.wav",
     "baseline": {
       "baseline_0_65": "demo_9/partial_0.65_norm.mp3",
       "baseline_0_70": "demo_9/partial_0.7_norm.mp3"
