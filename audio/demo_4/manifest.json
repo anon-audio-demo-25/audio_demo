@@ -1,8 +1,8 @@
 {
   "demo_id": "demo_4",
   "files": {
-    "context": "demo_4/ctx_bass_00.wav",
-    "reference": "demo_4/ref_guitare 1 r_00.wav",
+    "context": "demo_4/ctx_bass_00_norm.wav",
+    "reference": "demo_4/ref_guitare 1 r_00_norm.wav",
     "baseline": {
       "baseline_0_65": "demo_4/partial_0.65_norm.mp3",
       "baseline_0_70": "demo_4/partial_0.7_norm.mp3"
