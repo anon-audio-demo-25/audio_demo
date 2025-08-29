@@ -1,8 +1,8 @@
 {
   "demo_id": "demo_5",
   "files": {
-    "context": "demo_5/ctx_piano_00.wav",
-    "reference": "demo_5/ref_pad_00.wav",
+    "context": "demo_5/ctx_piano_00_norm.wav",
+    "reference": "demo_5/ref_pad_00_norm.wav",
     "baseline": {
       "baseline_0_65": "demo_5/partial_0.65_norm.mp3",
       "baseline_0_70": "demo_5/partial_0.7_norm.mp3"
