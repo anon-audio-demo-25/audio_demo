@@ -1,0 +1,41 @@
+{
+  "demo_id": "demo_14",
+  "results": {
+    "baseline_0_65": {
+      "DPD_mean": 0.17845861613750458,
+      "CLAP_mean": 0.6709054112434387,
+      "F1_onset_mean": 1.0,
+      "F1_offset_mean": 1.0,
+      "F1_joint_mean": 1.0,
+      "chroma_sim_mean": 0.9899424910545349,
+      "chroma_sim_ti_mean": 0.9899424910545349
+    },
+    "baseline_0_70": {
+      "DPD_mean": 29.22551155090332,
+      "CLAP_mean": 0.7431879639625549,
+      "F1_onset_mean": 1.0,
+      "F1_offset_mean": 1.0,
+      "F1_joint_mean": 1.0,
+      "chroma_sim_mean": 0.8847371339797974,
+      "chroma_sim_ti_mean": 0.8847371339797974
+    },
+    "marco_1": {
+      "DPD_mean": 4.811601161956787,
+      "CLAP_mean": 0.7153620719909668,
+      "F1_onset_mean": 1.0,
+      "F1_offset_mean": 1.0,
+      "F1_joint_mean": 1.0,
+      "chroma_sim_mean": 0.9253399968147278,
+      "chroma_sim_ti_mean": 0.9253399968147278
+    },
+    "marco_2": {
+      "DPD_mean": 0.346901535987854,
+      "CLAP_mean": 0.6984425187110901,
+      "F1_onset_mean": 1.0,
+      "F1_offset_mean": 1.0,
+      "F1_joint_mean": 1.0,
+      "chroma_sim_mean": 0.9334086179733276,
+      "chroma_sim_ti_mean": 0.9334086179733276
+    }
+  }
+}

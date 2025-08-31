@@ -24,6 +24,36 @@
       "demo_id": "demo_7",
       "manifest": "demo_7/manifest.json",
       "metrics": "demo_7/metrics.json"
+    },
+    {
+      "demo_id": "demo_11",
+      "manifest": "demo_11/manifest.json",
+      "metrics": "demo_11/metrics.json"
+    },
+    {
+      "demo_id": "demo_12",
+      "manifest": "demo_12/manifest.json",
+      "metrics": "demo_12/metrics.json"
+    },
+    {
+      "demo_id": "demo_13",
+      "manifest": "demo_13/manifest.json",
+      "metrics": "demo_13/metrics.json"
+    },
+    {
+      "demo_id": "demo_14",
+      "manifest": "demo_14/manifest.json",
+      "metrics": "demo_14/metrics.json"
+    },
+    {
+      "demo_id": "demo_15",
+      "manifest": "demo_15/manifest.json",
+      "metrics": "demo_15/metrics.json"
+    },
+    {
+      "demo_id": "demo_16",
+      "manifest": "demo_16/manifest.json",
+      "metrics": "demo_16/metrics.json"
     }
   ]
 }

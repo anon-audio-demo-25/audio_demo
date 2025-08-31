@@ -54,14 +54,6 @@
   td[data-metrics]{text-align:center;font-variant-numeric:tabular-nums}
 
   .sub{color:var(--muted);text-align:center;margin:0 0 18px}
-
-  /* divider row between demo pairs */
-  tbody tr.divider td{
-    padding:0; border:0; height:14px;
-  }
-  tbody tr.divider td .line{
-    height:1px; background:var(--line); opacity:.9; margin:6px 0;
-  }
 </style>
 </head>
 <body>
@@ -71,15 +63,15 @@
   </header>
 
   <div class="wrap">
-    <p class="sub"> Parameters for our methods are <em>tuned per demo</em> to highlight flexibility; the paper analyses structure in depth, but this demo emphasises timbre.</p>
     <div class="table-wrap">
       <table id="demo-table">
-        <colgroup><!-- 6 equal columns (no Demo column) -->
-          <col style="width:16.6667%"><col style="width:16.6667%"><col style="width:16.6667%">
-          <col style="width:16.6667%"><col style="width:16.6667%"><col style="width:16.6667%">
+        <colgroup><!-- 7 equal columns -->
+          <col style="width:14.2857%"><col style="width:14.2857%"><col style="width:14.2857%">
+          <col style="width:14.2857%"><col style="width:14.2857%"><col style="width:14.2857%"><col style="width:14.2857%">
         </colgroup>
         <thead>
           <tr>
+            <th><div class="th-title"><span>Demo</span></div></th>
             <th><div class="th-title"><span>Context</span></div></th>
             <th><div class="th-title"><span>Reference</span></div></th>
             <th><div class="th-title"><span>Baseline 0.65</span></div></th>
@@ -91,7 +83,7 @@
         <tbody id="tbody"></tbody>
       </table>
     </div>
-    <!-- <p class="sub">Tables are auto-built from <code>demos.json</code> and each demo’s <code>manifest.json</code>/<code>metrics.json</code>.</p> -->
+    <p class="sub">Tables are auto-built from <code>demos.json</code> and each demo’s <code>manifest.json</code>/<code>metrics.json</code>.</p>
   </div>
 
 <script>
@@ -106,7 +98,7 @@
 
   const demosIndex = await fetchJSON(audioBases.map(a => a + "demos.json"));
   if(!demosIndex){
-    document.getElementById('tbody').innerHTML = "<tr><td colspan='6' class='sub'>no demos.json found</td></tr>";
+    document.getElementById('tbody').innerHTML = "<tr><td colspan='7' class='sub'>no demos.json found</td></tr>";
     return;
   }
 
@@ -136,6 +128,7 @@
   });
 
   const tbody = document.getElementById('tbody');
+  let displayIndex = 0;
 
   // cell builder; `labelText` shows instrument (ctx/ref) or params (M1/M2). metrics kept but commented out.
   function makeCell(rel, tagKey, metrics, labelText){
@@ -154,11 +147,12 @@
     return td;
   }
 
-  for (let idx = 0; idx < demosSorted.length; idx++){
-    const item = demosSorted[idx];
+  for (const item of demosSorted){
     const manifest = await fetchJSON(audioBases.map(a => a + item.manifest));
     const metrics  = await fetchJSON(audioBases.map(a => a + item.metrics));
     if(!manifest){ continue; }
+
+    displayIndex += 1;
 
     const ctxRel = manifest.files.context;
     const refRel = manifest.files.reference;
@@ -180,23 +174,25 @@
     const m2Params = m2Rel ? parseParamsFromName(fileName(m2Rel)) : "";
 
     const row = document.createElement('tr');
+
+    // Demo number column
+    const tdIdx = document.createElement('td');
+    tdIdx.textContent = `Demo ${displayIndex}`;
+    row.appendChild(tdIdx);
+
+    // Context / Reference (show instruments if available)
     row.appendChild(makeCell(ctxRel, null, null, ctxInst || null));
     row.appendChild(makeCell(refRel, null, null, refInst || null));
+
+    // Baselines
     row.appendChild(makeCell(b065, "baseline_0_65", metrics, null));
     row.appendChild(makeCell(b070, "baseline_0_70", metrics, null));
+
+    // Methods (show parsed params per demo)
     row.appendChild(makeCell(m1Rel, "marco_1", metrics, m1Params || null));
     row.appendChild(makeCell(m2Rel, "marco_2", metrics, m2Params || null));
-    tbody.appendChild(row);
 
-    // add a divider after each demo except the last one rendered
-    const isLast = (idx === demosSorted.length - 1);
-    if (!isLast){
-      const sep = document.createElement('tr'); sep.className = 'divider';
-      const td = document.createElement('td'); td.colSpan = 6;
-      const line = document.createElement('div'); line.className = 'line';
-      td.appendChild(line); sep.appendChild(td);
-      tbody.appendChild(sep);
-    }
+    tbody.appendChild(row);
   }
 })();
 </script>

@@ -27,6 +27,7 @@
   .hero p{margin:0; opacity:.9}
 
   .wrap{max-width:1400px;margin:0 auto;padding:28px 16px 60px}
+  .demo-title{margin:28px 0 8px;font-weight:700;text-align:center}
 
   .table-wrap{
     border:1px solid var(--line); border-radius:14px; overflow:hidden;
@@ -54,44 +55,17 @@
   td[data-metrics]{text-align:center;font-variant-numeric:tabular-nums}
 
   .sub{color:var(--muted);text-align:center;margin:0 0 18px}
-
-  /* divider row between demo pairs */
-  tbody tr.divider td{
-    padding:0; border:0; height:14px;
-  }
-  tbody tr.divider td .line{
-    height:1px; background:var(--line); opacity:.9; margin:6px 0;
-  }
 </style>
 </head>
 <body>
   <header class="hero">
     <h1>Audio Demos</h1>
-    <p>Parameters for our methods are <em>tuned per demo</em>. This demo emphasises timbre.</p>
+    <p>tmp</p>
   </header>
 
   <div class="wrap">
     <p class="sub"> Parameters for our methods are <em>tuned per demo</em> to highlight flexibility; the paper analyses structure in depth, but this demo emphasises timbre.</p>
-    <div class="table-wrap">
-      <table id="demo-table">
-        <colgroup><!-- 6 equal columns (no Demo column) -->
-          <col style="width:16.6667%"><col style="width:16.6667%"><col style="width:16.6667%">
-          <col style="width:16.6667%"><col style="width:16.6667%"><col style="width:16.6667%">
-        </colgroup>
-        <thead>
-          <tr>
-            <th><div class="th-title"><span>Context</span></div></th>
-            <th><div class="th-title"><span>Reference</span></div></th>
-            <th><div class="th-title"><span>Baseline 0.65</span></div></th>
-            <th><div class="th-title"><span>Baseline 0.70</span></div></th>
-            <th><div class="th-title"><span>Ours (M1)</span></div></th>
-            <th><div class="th-title"><span>Old (M2)</span></div></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-    <!-- <p class="sub">Tables are auto-built from <code>demos.json</code> and each demo’s <code>manifest.json</code>/<code>metrics.json</code>.</p> -->
+    <div id="tables"></div>
   </div>
 
 <script>
@@ -106,7 +80,7 @@
 
   const demosIndex = await fetchJSON(audioBases.map(a => a + "demos.json"));
   if(!demosIndex){
-    document.getElementById('tbody').innerHTML = "<tr><td colspan='6' class='sub'>no demos.json found</td></tr>";
+    document.getElementById('tables').innerHTML = "<p class='sub'>no demos.json found</p>";
     return;
   }
 
@@ -128,42 +102,65 @@
     return bits.join(', ');
   }
 
-  // numeric ordering by demo_id if present
+  // Keep deterministic ordering (numeric by demo_id if present)
   const demosSorted = [...(demosIndex.demos || [])].sort((a, b) => {
     const na = parseInt((a.demo_id||'').match(/\d+/)?.[0] ?? '0', 10);
     const nb = parseInt((b.demo_id||'').match(/\d+/)?.[0] ?? '0', 10);
     return na - nb;
   });
 
-  const tbody = document.getElementById('tbody');
+  const host = document.getElementById('tables');
 
-  // cell builder; `labelText` shows instrument (ctx/ref) or params (M1/M2). metrics kept but commented out.
+  // create a 6-col colgroup with equal widths
+  function equalCols(){
+    const cg = document.createElement('colgroup');
+    for (let i=0;i<6;i++){ const c = document.createElement('col'); c.style.width = (100/6)+'%'; cg.appendChild(c); }
+    return cg;
+  }
+
+  // cell builder; `labelText` is optional (we'll use it only for context/reference instruments)
   function makeCell(rel, tagKey, metrics, labelText){
     const td = document.createElement('td');
     if (!rel){ td.textContent = '—'; return td; }
     const w = document.createElement('div'); w.className = 'cell';
     w.appendChild(audioTag(rel, guessMime(rel)));
-    if (labelText){
+    if (labelText){  // no filenames anymore
       const s = document.createElement('small');
       s.textContent = labelText;
       w.appendChild(s);
     }
+    // metrics line kept but commented out:
     // const m = metrics && metrics.results ? metrics.results[tagKey] : null;
     // if (m){ const mm = document.createElement('small'); mm.textContent = `DPD ${m.DPD_mean?.toFixed?.(1) ?? '—'} | CLAP ${m.CLAP_mean?.toFixed?.(3) ?? '—'}`; w.appendChild(mm); }
     td.appendChild(w);
     return td;
   }
 
-  for (let idx = 0; idx < demosSorted.length; idx++){
-    const item = demosSorted[idx];
+  function thWithParams(title, params){
+    const th = document.createElement('th');
+    const box = document.createElement('div'); box.className = 'th-title';
+    const span = document.createElement('span'); span.textContent = title;
+    box.appendChild(span);
+    if (params){
+      const sm = document.createElement('small'); sm.textContent = params;
+      box.appendChild(sm);
+    }
+    th.appendChild(box);
+    return th;
+  }
+
+  let displayIndex = 0; // <-- sequential demo numbering
+  for (const item of demosSorted){
     const manifest = await fetchJSON(audioBases.map(a => a + item.manifest));
     const metrics  = await fetchJSON(audioBases.map(a => a + item.metrics));
     if(!manifest){ continue; }
 
+    displayIndex += 1;  // increment only for demos we actually render
+
     const ctxRel = manifest.files.context;
     const refRel = manifest.files.reference;
 
-    // optional instruments from manifest or labels override
+    // instruments (optional) — put these in manifest.json or labels.json override
     const ctxInst = manifest.meta?.context_instrument || manifest.labels?.context || "";
     const refInst = manifest.meta?.reference_instrument || manifest.labels?.reference || "";
 
@@ -179,24 +176,47 @@
     const m1Params = m1Rel ? parseParamsFromName(fileName(m1Rel)) : "";
     const m2Params = m2Rel ? parseParamsFromName(fileName(m2Rel)) : "";
 
+    const section = document.createElement('section');
+    section.id = `demo-${displayIndex}`; // optional anchor
+
+    const title = document.createElement('div');
+    title.className = 'demo-title';
+    title.textContent = `Demo ${displayIndex}`;  // <-- numbered title (not folder name)
+
+    const card = document.createElement('div'); card.className = 'table-wrap';
+    const tbl = document.createElement('table');
+
+    // equal-width columns
+    tbl.appendChild(equalCols());
+
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    hr.appendChild(thWithParams('Context', ''));
+    hr.appendChild(thWithParams('Reference', ''));
+    hr.appendChild(thWithParams('Baseline 0.65', ''));
+    hr.appendChild(thWithParams('Baseline 0.70', ''));
+    hr.appendChild(thWithParams('Ours (M1)', m1Params));
+    hr.appendChild(thWithParams('Old (M2)', m2Params));
+    thead.appendChild(hr);
+    tbl.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
     const row = document.createElement('tr');
+
     row.appendChild(makeCell(ctxRel, null, null, ctxInst || null));
     row.appendChild(makeCell(refRel, null, null, refInst || null));
     row.appendChild(makeCell(b065, "baseline_0_65", metrics, null));
     row.appendChild(makeCell(b070, "baseline_0_70", metrics, null));
-    row.appendChild(makeCell(m1Rel, "marco_1", metrics, m1Params || null));
-    row.appendChild(makeCell(m2Rel, "marco_2", metrics, m2Params || null));
-    tbody.appendChild(row);
+    row.appendChild(makeCell(m1Rel, "marco_1", metrics, null));
+    row.appendChild(makeCell(m2Rel, "marco_2", metrics, null));
 
-    // add a divider after each demo except the last one rendered
-    const isLast = (idx === demosSorted.length - 1);
-    if (!isLast){
-      const sep = document.createElement('tr'); sep.className = 'divider';
-      const td = document.createElement('td'); td.colSpan = 6;
-      const line = document.createElement('div'); line.className = 'line';
-      td.appendChild(line); sep.appendChild(td);
-      tbody.appendChild(sep);
-    }
+    tbody.appendChild(row);
+    tbl.appendChild(tbody);
+
+    card.appendChild(tbl);
+    section.appendChild(title);
+    section.appendChild(card);
+    document.getElementById('tables').appendChild(section);
   }
 })();
 </script>

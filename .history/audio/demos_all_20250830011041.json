@@ -1,0 +1,54 @@
+{
+  "demos": [
+    {
+      "demo_id": "demo_1",
+      "manifest": "demo_1/manifest.json",
+      "metrics": "demo_1/metrics.json"
+    },
+    {
+      "demo_id": "demo_10",
+      "manifest": "demo_10/manifest.json",
+      "metrics": "demo_10/metrics.json"
+    },
+    {
+      "demo_id": "demo_2",
+      "manifest": "demo_2/manifest.json",
+      "metrics": "demo_2/metrics.json"
+    },
+    {
+      "demo_id": "demo_3",
+      "manifest": "demo_3/manifest.json",
+      "metrics": "demo_3/metrics.json"
+    },
+    {
+      "demo_id": "demo_4",
+      "manifest": "demo_4/manifest.json",
+      "metrics": "demo_4/metrics.json"
+    },
+    {
+      "demo_id": "demo_5",
+      "manifest": "demo_5/manifest.json",
+      "metrics": "demo_5/metrics.json"
+    },
+    {
+      "demo_id": "demo_6",
+      "manifest": "demo_6/manifest.json",
+      "metrics": "demo_6/metrics.json"
+    },
+    {
+      "demo_id": "demo_7",
+      "manifest": "demo_7/manifest.json",
+      "metrics": "demo_7/metrics.json"
+    },
+    {
+      "demo_id": "demo_8",
+      "manifest": "demo_8/manifest.json",
+      "metrics": "demo_8/metrics.json"
+    },
+    {
+      "demo_id": "demo_9",
+      "manifest": "demo_9/manifest.json",
+      "metrics": "demo_9/metrics.json"
+    }
+  ]
+}

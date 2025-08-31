@@ -1,0 +1,21 @@
+{
+  "demo_id": "demo_15",
+  "files": {
+    "context": "demo_15/ctx_musicbox 4623_00.wav",
+    "reference": "demo_15/ref_cello_00.wav",
+    "baseline": {
+      "baseline_0_65": "demo_15/partial_0.65_norm.mp3",
+      "baseline_0_70": "demo_15/partial_0.7_norm.mp3"
+    },
+    "marco_1": [
+      "demo_15/marco_1_k_0.55_clamp_0.25_norm.mp3"
+    ],
+    "marco_2": [
+      "demo_15/marco_2_k_0.3_clamp_0.3_norm.mp3"
+    ]
+  },
+  "meta":{
+    "context_instrument": "MusicBox", 
+    "reference_instrument": "Cello" 
+  }
+}
